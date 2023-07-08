@@ -5,23 +5,23 @@ import * as floats from "../floats/mod.ts";
 
 import { Index, Shape, T } from "./types.ts";
 
-export const size = (a: T): number => {
+export function size(a: T): number {
   return sizeOfShape(a.shape());
-};
+}
 
-export const sizeOfShape = (shape: number[]): number => {
+export function sizeOfShape(shape: number[]): number {
   return shape.reduce((acc, x) => acc * x, 1);
-};
+}
 
-export const arrayEqual = (a: T, b: T): boolean => {
+export function arrayEqual(a: T, b: T): boolean {
   if (!numerical.arrayEqual(a.shape(), b.shape())) {
     return false;
   }
 
   return floats.arrayEqual(a.buffer(), b.buffer());
-};
+}
 
-export const shapeEqual = (a: Shape, b: Shape): boolean => {
+export function shapeEqual(a: Shape, b: Shape): boolean {
   if (a.length !== b.length) {
     return false;
   }
@@ -31,20 +31,20 @@ export const shapeEqual = (a: Shape, b: Shape): boolean => {
     }
   }
   return true;
-};
+}
 
-export const isT = (x: any): x is T => {
+export function isT(x: any): x is T {
   if ("@type" in x) {
     return x["@type"] === "ndarray";
   }
   return false;
-};
+}
 
-export const assertArrayEqual = (
+export function assertArrayEqual(
   actual: T,
   expected: T,
   msg?: string,
-): void => {
+): void {
   if (arrayEqual(actual, expected)) {
     return;
   }
@@ -60,9 +60,9 @@ export const assertArrayEqual = (
     Array.from(expected.buffer()),
     message,
   );
-};
+}
 
-export const toArray = (a: T): any => {
+export function toArray(a: T): any {
   if (a.shape().length === 0) {
     return a.item();
   }
@@ -71,9 +71,9 @@ export const toArray = (a: T): any => {
     result.push(toArray(a.get([i])));
   }
   return result;
-};
+}
 
-export const make = (shape: number[], buffer: Float32Array): T => {
+export function make(shape: number[], buffer: Float32Array): T {
   asserts.assertEquals(sizeOfShape(shape), buffer.length);
 
   const a = {
@@ -135,13 +135,13 @@ export const make = (shape: number[], buffer: Float32Array): T => {
   };
 
   return a;
-};
+}
 
-const getSubarray = (
+function getSubarray(
   arr: Float32Array,
   shape: number[],
   idx: number[],
-): Float32Array => {
+): Float32Array {
   if (idx.length === 0) {
     return arr;
   }
@@ -153,9 +153,9 @@ const getSubarray = (
     shape.slice(1),
     idx.slice(1),
   );
-};
+}
 
-const copyWithBroadcast = (dst: T, src: T): void => {
+function copyWithBroadcast(dst: T, src: T): void {
   [dst, src] = matchDimsForOp(dst, src);
   asserts.assertEquals(dst.shape().length, src.shape().length);
 
@@ -185,26 +185,26 @@ const copyWithBroadcast = (dst: T, src: T): void => {
       src.get([i * srcStep]),
     );
   }
-};
+}
 
-const matchDimsForOp = (a: T, b: T): [T, T] => {
+function matchDimsForOp(a: T, b: T): [T, T] {
   const targetNumDims = Math.max(a.shape().length, b.shape().length);
   return [extendDimForOp(a, targetNumDims), extendDimForOp(b, targetNumDims)];
-};
+}
 
-const extendDimForOp = (a: T, target: number): T => {
+function extendDimForOp(a: T, target: number): T {
   asserts.assert(a.shape().length <= target);
 
   const newShape = [...new Array(target - a.ndim()).fill(1), ...a.shape()];
 
   return make(newShape, a.buffer());
-};
+}
 
-export const fromNumber = (v: number): T => {
+export function fromNumber(v: number): T {
   return make([], new Float32Array([v]));
-};
+}
 
-export const fromArray = (arr: any): T => {
+export function fromArray(arr: any): T {
   const shape = [];
 
   let size = 1;
@@ -224,13 +224,13 @@ export const fromArray = (arr: any): T => {
   }
 
   return make(shape, buffer);
-};
+}
 
-const setArrayFromList = (
+function setArrayFromList(
   buffer: Float32Array,
   arr: any,
   shape: Shape,
-) => {
+) {
   if (shape.length === 1) {
     for (let i = 0; i < arr.length; i++) {
       buffer[i] = arr[i];
@@ -247,4 +247,4 @@ const setArrayFromList = (
       shape.slice(1),
     );
   }
-};
+}

@@ -7,23 +7,23 @@ import { make, size, sizeOfShape } from "./array.ts";
 import { zeros } from "./array_creation.ts";
 import { copyWithPermutation } from "./op.ts";
 
-export const reshape = (a: T, newShape: Shape): T => {
+export function reshape(a: T, newShape: Shape): T {
   asserts.assertEquals(sizeOfShape(newShape), sizeOfShape(a.shape()));
 
   return make(newShape, a.buffer());
-};
+}
 
-export const expandDims = (a: T, axis: number): T => {
+export function expandDims(a: T, axis: number): T {
   return reshape(a, [...a.shape().slice(0, axis), 1, ...a.shape().slice(axis)]);
-};
+}
 
-export const squeeze = (a: T, axis: number): T => {
+export function squeeze(a: T, axis: number): T {
   asserts.assertEquals(a.shape()[axis], 1);
   return reshape(a, [
     ...a.shape().slice(0, axis),
     ...a.shape().slice(axis + 1),
   ]);
-};
+}
 
 export function concatenate(lst: T[], axis: number): T {
   asserts.assert(lst.length >= 1);
@@ -101,7 +101,7 @@ export const repeat = (a: T, repeats: number): T => {
 };
 
 /** Returns the view of `a` with the first dimension sliced [start, end). */
-export const slice = (a: T, start: number, end: number): T => {
+export function slice(a: T, start: number, end: number): T {
   asserts.assert(a.ndim() >= 1);
   const firstDim = a.shape()[0];
   asserts.assert(start >= 0 && start <= firstDim);
@@ -110,20 +110,14 @@ export const slice = (a: T, start: number, end: number): T => {
 
   const restDims = a.shape().slice(1);
   const stride = sizeOfShape(restDims);
-  // console.log(stride);
-  // console.log(end - start);
-  // console.log(start * stride, end * stride);
 
   const bufferView = a.buffer().subarray(start * stride, end * stride);
-  // console.log(a.buffer());
-  // console.log(bufferView);
   const newShape = [end - start, ...restDims];
-  // console.log(newShape);
 
   return make(newShape, bufferView);
-};
+}
 
-export const transpose = (a: T, axes: number[]): T => {
+export function transpose(a: T, axes: number[]): T {
   asserts.assertEquals(a.shape().length, axes.length);
 
   const newShape = [] as Shape;
@@ -142,7 +136,7 @@ export const transpose = (a: T, axes: number[]): T => {
   );
 
   return make(newShape, buffer);
-};
+}
 
 export function swapaxes(a: T, axis1: number, axis2: number): T {
   const axes = arrays.range(0, a.ndim(), 1);
@@ -151,7 +145,7 @@ export function swapaxes(a: T, axis1: number, axis2: number): T {
   return transpose(a, axes);
 }
 
-export const flip1D = (a: T): T => {
+export function flip1D(a: T): T {
   asserts.assertEquals(a.ndim(), 1);
 
   const n = a.shape()[0];
@@ -163,9 +157,9 @@ export const flip1D = (a: T): T => {
   }
 
   return make([n], buffer);
-};
+}
 
-export const pad1D = (a: T, num: number): T => {
+export function pad1D(a: T, num: number): T {
   asserts.assertEquals(a.ndim(), 1);
 
   const padding = zeros([num]);
@@ -174,4 +168,4 @@ export const pad1D = (a: T, num: number): T => {
     a,
     padding,
   ], 0);
-};
+}

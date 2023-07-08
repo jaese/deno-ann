@@ -1,6 +1,6 @@
 import { Index, Shape, T } from "./types.ts";
 
-export const ndindex = function* (s: Shape): Iterable<Index> {
+export function* ndindex(s: Shape): Iterable<Index> {
   // TODO: handle s empty
   const iterDim = function* (idx: Index, rest: Shape): Iterable<Index> {
     if (rest.length === 1) {
@@ -19,4 +19,4 @@ export const ndindex = function* (s: Shape): Iterable<Index> {
   for (const idx of iterDim([], s)) {
     yield idx;
   }
-};
+}

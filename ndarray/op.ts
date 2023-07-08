@@ -7,12 +7,12 @@ import { make, size, sizeOfShape } from "./array.ts";
 import { zeros } from "./array_creation.ts";
 import { concatenate, expandDims } from "./array_manipulation.ts";
 
-export const reduceAxis2 = <Acc>(
+export function reduceAxis2<Acc>(
   a: T,
   axis: number,
   func: (acc: Acc, idx: number, x: number) => [Acc, number],
   initialValue: Acc,
-): T => {
+): T {
   // console.log(axis, a.shape.length);
   const ax = numerical.mod(axis, a.shape().length);
   // console.log("ax", ax);
@@ -27,15 +27,15 @@ export const reduceAxis2 = <Acc>(
     initialValue,
   );
   return dst;
-};
+}
 
-const reduceAxis2Inner = <Acc>(
+function reduceAxis2Inner<Acc>(
   dst: T,
   a: T,
   axis: number,
   func: (acc: Acc, idx: number, x: number) => [Acc, number],
   initialValue: Acc,
-) => {
+) {
   if (axis === 0) {
     const stride = sizeOfShape(a.shape().slice(1));
     asserts.assertEquals(dst.buffer().length, stride);
@@ -59,14 +59,14 @@ const reduceAxis2Inner = <Acc>(
       );
     }
   }
-};
+}
 
-export const reduceAxis = (
+export function reduceAxis(
   a: T,
   axis: number,
   func: (acc: number, x: number) => number,
   initialValue: number,
-): T => {
+): T {
   const ax = numerical.mod(axis, a.shape().length);
   const newShape = [...a.shape().slice(0, ax), ...a.shape().slice(ax + 1)];
   const buffer = new Float32Array(sizeOfShape(newShape));
@@ -79,15 +79,15 @@ export const reduceAxis = (
     initialValue,
   );
   return dst;
-};
+}
 
-const reduceAxisInner = (
+function reduceAxisInner(
   dst: T,
   a: T,
   axis: number,
   func: (acc: number, x: number) => number,
   initialValue: number,
-): void => {
+): void {
   if (axis === 0) {
     const stride = sizeOfShape(a.shape().slice(1));
     asserts.assertEquals(dst.buffer().length, stride);
@@ -109,13 +109,13 @@ const reduceAxisInner = (
       );
     }
   }
-};
+}
 
-export const applyWithArrayResult = (
+export function applyWithArrayResult(
   a: T,
   dim: number,
   f: (x: number) => number[],
-): T => {
+): T {
   const buffer = new Float32Array(size(a) * dim);
   for (let i = 0; i < a.buffer().length; i++) {
     const resultArr = f(a.buffer()[i]);
@@ -124,15 +124,15 @@ export const applyWithArrayResult = (
     }
   }
   return make([...a.shape(), dim], buffer);
-};
+}
 
-export const copyWithPermutation = (
+export function copyWithPermutation(
   buffer: Float32Array,
   newShape: Shape,
   a: T,
   axes: number[],
   idx: Index,
-): void => {
+): void {
   if (axes.length === 0) {
     buffer[0] = a.get(idx).item();
     return;
@@ -150,13 +150,13 @@ export const copyWithPermutation = (
       idx,
     );
   }
-};
+}
 
-export const elementwiseOp = (
+export function elementwiseOp(
   a: T,
   b: T,
   func: (x: number, y: number) => number,
-): T => {
+): T {
   const [aExtended, bExtended] = matchDimsForOp(a, b);
   const resultShape = shapeFromOpWithBroadcast(
     aExtended.shape(),
@@ -170,23 +170,23 @@ export const elementwiseOp = (
     func,
   );
   return result;
-};
+}
 
 // TODO: reconcile with one in array.ts
-const matchDimsForOp = (a: T, b: T): [T, T] => {
+function matchDimsForOp(a: T, b: T): [T, T] {
   const targetNumDims = Math.max(a.shape().length, b.shape().length);
   return [extendDimForOp(a, targetNumDims), extendDimForOp(b, targetNumDims)];
-};
+}
 
-const extendDimForOp = (a: T, target: number): T => {
+function extendDimForOp(a: T, target: number): T {
   asserts.assert(a.shape().length <= target);
 
   const newShape = [...new Array(target - a.ndim()).fill(1), ...a.shape()];
 
   return make(newShape, a.buffer());
-};
+}
 
-const shapeFromOpWithBroadcast = (s1: Shape, s2: Shape): Shape => {
+function shapeFromOpWithBroadcast(s1: Shape, s2: Shape): Shape {
   asserts.assertEquals(s1.length, s2.length);
 
   const result = [] as number[];
@@ -203,15 +203,14 @@ const shapeFromOpWithBroadcast = (s1: Shape, s2: Shape): Shape => {
   }
 
   return result;
-};
+}
 
-const opWithBroadcast = (
+function opWithBroadcast(
   dst: T,
   a: T,
   b: T,
   func: (x: number, y: number) => number,
-): void => {
-  // console.log("copyWithBroadcast", dst, src);
+): void {
   asserts.assertEquals(a.shape().length, b.shape().length);
 
   if (dst.shape().length === 0) {
@@ -246,17 +245,17 @@ const opWithBroadcast = (
       func,
     );
   }
-};
+}
 
-export const apply = (a: T, f: (x: number) => number): T => {
+export function apply(a: T, f: (x: number) => number): T {
   const result = zeros(a.shape());
   for (let i = 0; i < size(a); i++) {
     result.buffer()[i] = f(a.buffer()[i]);
   }
   return result;
-};
+}
 
-export const combine = (a: T, b: T, f: (x: number, y: number) => number): T => {
+export function combine(a: T, b: T, f: (x: number, y: number) => number): T {
   asserts.assertEquals(a.shape(), b.shape());
 
   const result = zeros(a.shape());
@@ -264,13 +263,13 @@ export const combine = (a: T, b: T, f: (x: number, y: number) => number): T => {
     result.buffer()[i] = f(a.buffer()[i], b.buffer()[i]);
   }
   return result;
-};
+}
 
-export const map = (fun: (x: T) => T, xs: T): T => {
+export function map(fun: (x: T) => T, xs: T): T {
   const result = [];
   for (let i = 0; i < xs.shape()[0]; i++) {
     const y = fun(xs.get([i]));
     result.push(expandDims(y, 0));
   }
   return concatenate(result, 0);
-};
+}

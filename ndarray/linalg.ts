@@ -3,7 +3,7 @@ import { asserts } from "../deps.ts";
 import { Index, Shape, T } from "./types.ts";
 import { make, sizeOfShape } from "./array.ts";
 
-export const matmul = (a: T, b: T): T => {
+export function matmul(a: T, b: T): T {
   asserts.assertEquals(a.ndim(), 2);
   asserts.assertEquals(b.ndim(), 2);
   asserts.assertEquals(a.shape()[1], b.shape()[0]);
@@ -27,4 +27,4 @@ export const matmul = (a: T, b: T): T => {
   }
 
   return make(newShape, outBuffer);
-};
+}
