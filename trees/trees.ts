@@ -259,13 +259,13 @@ export function iteratePaths(x: T): Iterable<Path> {
   const iterNode = function* (p: Path, rest: T): Iterable<Path> {
     if (isLeaf(rest)) {
       yield p;
-    } else if (rest instanceof Array<T>) {
+    } else if (rest instanceof Array) {
       for (let i = 0; i < rest.length; i++) {
         for (const restPath of iterNode([...p, i], rest[i])) {
           yield restPath;
         }
       }
-    } else if (rest instanceof Map<string, T>) {
+    } else if (rest instanceof Map) {
       const keys = Array.from(rest.keys());
       keys.sort();
       for (const key of keys) {
@@ -289,11 +289,11 @@ export function getLeafByPath(x: T, p: Path): nd.T {
 
   if (isLeaf(x)) {
     throw new Error(JSON.stringify(p));
-  } else if (x instanceof Map<string, T>) {
+  } else if (x instanceof Map) {
     const key = p[0];
     asserts.assert((typeof key) === "string");
     return getLeafByPath(x.get(key)!, p.slice(1));
-  } else if (x instanceof Array<T>) {
+  } else if (x instanceof Array) {
     const idx = p[0];
     asserts.assert(Number.isInteger(idx));
     return getLeafByPath(x[idx as number], p.slice(1));
@@ -306,12 +306,12 @@ export function plurality(x: T): number {
   if (isLeaf(x)) {
     asserts.assert(x.ndim() >= 1);
     return x.shape()[0];
-  } else if (x instanceof Map<string, T>) {
+  } else if (x instanceof Map) {
     for (const elem of x.values()) {
       return plurality(elem);
     }
     throw new Error(`${x}`);
-  } else if (x instanceof Array<T>) {
+  } else if (x instanceof Array) {
     return plurality(x[0]);
   } else {
     throw new Error(x);

@@ -1,3 +1,5 @@
+import { asserts } from "../deps.ts";
+
 import { erf } from "./erf.ts";
 
 export function sampleNormalDist(mu: number, sigma: number): number {
@@ -33,4 +35,29 @@ export function inverseNormalCDF(
 
 export function normalCDF(x: number, mu: number, sigma: number): number {
   return (1 + erf((x - mu) / Math.sqrt(2) / sigma)) / 2;
+}
+
+export function getRandomInt(max: number): number {
+  return Math.floor(Math.random() * max);
+}
+
+export function randomChoice<T>(arr: T[]): T {
+  return arr[getRandomInt(arr.length)];
+}
+
+export function getRandomIntProbas(probas: number[]): number {
+  const probasAcc = [] as number[];
+  for (let i = 0; i < probas.length; i++) {
+    const prev = i === 0 ? 0 : probasAcc[i - 1];
+    probasAcc.push(probas[i] + prev);
+  }
+  asserts.assertAlmostEquals(probasAcc[probasAcc.length - 1], 1);
+
+  const r = Math.random();
+  for (let i = 0; i < probasAcc.length; i++) {
+    if (r < probasAcc[i]) {
+      return i;
+    }
+  }
+  throw new Error("Not supposed to reach here");
 }

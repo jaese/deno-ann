@@ -51,7 +51,7 @@ async function trainAndEvaluate(
     );
   }
 
-  saveMNISTModel(workDir, epoch, model);
+  await saveMNISTModel(workDir, epoch, model);
 }
 
 function trainEpoch(

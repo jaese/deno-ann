@@ -13,6 +13,7 @@ This libray is what [Toy - MNIST Classification](https://jaeyoung.se/toys/mnist)
 
 * `neural/` - contains the basic building blocks that can be used to build and train artificial neural networks.
 * `examples/mnist/` - MNIST classification example.
+* `examples/text_generation/` - Text generation with character-based RNN
 * `ndarray/` - multi-dimensional arrays a la numpy
 * `trees/` - functions to manipulate tree-like structures a la [Pytrees](https://jax.readthedocs.io/en/latest/pytrees.html)
 * `arrays/` - array utilities

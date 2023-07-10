@@ -1,6 +1,6 @@
 import { asserts } from "../deps.ts";
 
-import * as numerical from "../numerical/mod.ts";
+import * as arrays from "../arrays/mod.ts";
 import * as floats from "../floats/mod.ts";
 
 import { Index, Shape, T } from "./types.ts";
@@ -14,7 +14,7 @@ export function sizeOfShape(shape: number[]): number {
 }
 
 export function arrayEqual(a: T, b: T): boolean {
-  if (!numerical.arrayEqual(a.shape(), b.shape())) {
+  if (!arrays.arrayEqual(a.shape(), b.shape())) {
     return false;
   }
 
